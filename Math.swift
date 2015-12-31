@@ -14,3 +14,23 @@ func random(var from from: CGFloat, var to: CGFloat) -> Void -> CGFloat {
 			+ from
 	}
 }
+
+/// Transform a mathematical function `f` into a new mathematical function using
+/// standard transformation parameters (`a`, `b`, `d`, and `h`).
+///
+/// As few as none and as many as all of the parameters may be specified. At
+/// least one must be specified for the transformation to have any effect; the
+/// default parameters leave `f` untransformed.
+///
+/// - parameters:
+///		- f: function to transform
+///		- a: vertical scale factor
+///		- b: horizontal scale factor (behavior varies between functions)
+///		- h: horizontal shift
+///		- d: vertical shift
+///
+func transform(f: (Double -> Double), a: Double = 1, b: Double = 1, h: Double = 0, d: Double = 0) -> Double -> Double {
+	return { x in
+		a * f(b * (x - h)) + d
+	}
+}
