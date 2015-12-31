@@ -34,3 +34,12 @@ func transform(f: (Double -> Double), a: Double = 1, b: Double = 1, h: Double = 
 		a * f(b * (x - h)) + d
 	}
 }
+
+/// Returns the number a given percentage from one number to another.
+///
+///	- parameter percentage: The percentage specifying where in the given range
+///		the desired value is located.
+///
+func numberScaledByPercentage(percentage: Double, from: Double, to: Double) -> Double {
+	return from + percentage * (to - from)
+}
