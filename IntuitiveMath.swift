@@ -4,12 +4,12 @@
 //
 
 /// Create a random number generator whose outputs are within a given range.
-func random(var from from: CGFloat, var to: CGFloat) -> Void -> CGFloat {
+func random(var from from: Double, var to: Double) -> Void -> Double {
 	if to < from { swap(&to, &from) }
 	return { _ in
-		(((CGFloat(arc4random())
-			% (CGFloat(UInt32.max) + 1))
-			/ CGFloat(UInt32.max))
+		(((Double(arc4random())
+			% (Double(UInt32.max) + 1))
+			/ Double(UInt32.max))
 			* (to - from))
 			+ from
 	}
