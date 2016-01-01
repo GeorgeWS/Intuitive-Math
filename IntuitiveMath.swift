@@ -120,7 +120,7 @@ struct IntuitiveCurve {
 	///			and a horizontal line located `percentInset` percent up from the
 	///			bottom (left if increasing, right if decreasing) limit.
 	///		- LeftLimit: the limit of the left asymptote (as x → -∞)
-	enum YHandle {
+	enum YHandle: Equatable {
 		case RightLimit(Double)
 		case TopIntercept(Double)
 		case BottomIntercept(Double)
@@ -142,4 +142,16 @@ struct IntuitiveCurve {
 	
 	init(from: Double, to: Double, withYHandles yHandles: (YHandle, YHandle) = (.LeftLimit(0), .RightLimit(1)), insetByPercent percentInset: Double = 0.01)
 	
+}
+
+/// Two YHandles are considered equal iff their cases match (i.e. regardless of
+/// their associated values).
+func ==(lhs: IntuitiveCurve.YHandle, rhs: IntuitiveCurve.YHandle) -> Bool {
+	switch (lhs, rhs) {
+	case (.RightLimit, .RightLimit): return true
+	case (.LeftLimit, .LeftLimit): return true
+	case (.TopIntercept, .TopIntercept): return true
+	case (.BottomIntercept, .BottomIntercept): return true
+	default: return false
+	}
 }
