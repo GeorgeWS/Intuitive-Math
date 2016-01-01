@@ -107,23 +107,21 @@ func numberScaledByPercentage(percentage: Double, from: Double, to: Double) -> D
 ///
 struct IntuitiveCurve {
 	
-	/// Specifies the different "handles" that can be controlled vertically in
-	/// an `IntuitiveCurve`. Cases are spcefified in decreasing order on an
-	/// untransformed `IntuitiveCurve`.
-	///
-	/// - cases:
-	///		- RightLimit: the limit of the right asymptote (as x → ∞)
-	///		- TopIntercept: the y value of the intersection between the curve
-	///			and a horizontal line located `percentInset` percent down from
-	///			the top (right if increasing, left if decreasing) limit.
-	///		- BottomIntercept: the y value of the intersection between the curve
-	///			and a horizontal line located `percentInset` percent up from the
-	///			bottom (left if increasing, right if decreasing) limit.
-	///		- LeftLimit: the limit of the left asymptote (as x → -∞)
+	/// The different "handles" that can be controlled vertically in an
+	/// `IntuitiveCurve`. Cases are listed in decreasing order of where they
+	/// would be located vertically on an untransformed `IntuitiveCurve`.
 	enum YHandle: Equatable {
+		/// The limit of the right asymptote (as x → ∞)
 		case RightLimit(Double)
+		/// The y value of the intersection between the curve and a horizontal
+		/// line located `percentInset` percent down from the top (right if
+		/// increasing, left if decreasing) limit.
 		case TopIntercept(Double)
+		/// The y value of the intersection between the curve and a horizontal
+		/// line located `percentInset` percent up from the bottom (left if
+		/// increasing, right if decreasing) limit.
 		case BottomIntercept(Double)
+		/// The limit of the left asymptote (as x → -∞)
 		case LeftLimit(Double)
 	}
 	
