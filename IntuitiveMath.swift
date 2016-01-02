@@ -3,6 +3,8 @@
 //  Copyright (c) 2015 George Woodliff-Stanley.
 //
 
+import Darwin
+
 /// Create a random number generator whose outputs are within a given range.
 func random(var from from: Double, var to: Double) -> Void -> Double {
 	if to < from { swap(&to, &from) }
@@ -139,7 +141,57 @@ struct IntuitiveCurve {
 	
 	lazy var apply: Double -> Double
 	
-	init(from: Double, to: Double, withYHandles yHandles: (YHandle, YHandle) = (.LeftLimit(0), .RightLimit(1)), insetByPercent percentInset: Double = 0.01)
+	init(from: Double, to: Double, withYHandles yHandles: (YHandle, YHandle) = (.LeftLimit(0), .RightLimit(1)), insetByPercent percentInset: Double = 0.01) {
+		
+		let (handle1, handle2) = yHandles
+		guard handle1 != handle2 else { fatalError("The same case cannot be used for both y-handles of an IntuitiveCurve") }
+		
+		self.percentInset = percentInset
+		
+		var leftLimit: Double?, leftIntercept: Double?, rightIntercept: Double?, rightLimit: Double?
+		
+		switch handle1 {
+		case .RightLimit(let y): rightLimit = y
+		case .RightIntercept(let y): rightIntercept = y
+		case .LeftIntercept(let y): leftIntercept = y
+		case .LeftLimit(let y): leftLimit = y
+		}
+		
+		switch handle2 {
+		case .RightLimit(let y): rightLimit = y
+		case .RightIntercept(let y): rightIntercept = y
+		case .LeftIntercept(let y): leftIntercept = y
+		case .LeftLimit(let y): leftLimit = y
+		}
+		
+		switch (leftLimit, leftIntercept, rightIntercept, rightLimit) {
+		case (let leftLimit?, _, _, let rightLimit?):
+			leftIntercept = numberScaledByPercentage(percentInset, from: leftLimit, to: rightLimit)
+			rightIntercept = numberScaledByPercentage(1 - percentInset, from: leftLimit, to: rightLimit)
+		case (let leftLimit?, _, let rightIntercept?, _):
+			rightLimit = numberScaledByPercentage(1 / (1 - percentInset), from: leftLimit, to: rightIntercept)
+			leftIntercept = numberScaledByPercentage(percentInset, from: leftLimit, to: rightLimit!)
+		case (let leftLimit?, let leftIntercept?, _, _):
+			rightLimit = numberScaledByPercentage(1 / percentInset, from: leftLimit, to: leftIntercept)
+			rightIntercept = numberScaledByPercentage(1 - percentInset, from: leftLimit, to: rightLimit!)
+		case (_, let leftIntercept?, _, let rightLimit?):
+			leftLimit = numberScaledByPercentage(1 / (1 - percentInset), from: rightLimit, to: leftIntercept)
+			rightIntercept = numberScaledByPercentage(1 - percentInset, from: leftLimit!, to: rightLimit)
+		case (_, let leftIntercept?, let rightIntercept?, _):
+			rightLimit = numberScaledByPercentage((1 - percentInset) / (1 - 2 * percentInset), from: leftIntercept, to: rightIntercept)
+			leftLimit = numberScaledByPercentage(1 / (1 - percentInset), from: rightLimit!, to: leftIntercept)
+		case (_, _, let rightIntercept?, let rightLimit?):
+			leftLimit = numberScaledByPercentage(1 / percentInset, from: rightLimit, to: rightIntercept)
+			leftIntercept = numberScaledByPercentage(percentInset, from: leftLimit!, to: rightLimit)
+		default: break
+		}
+		
+		self.rightLimit = rightLimit!
+		self.rightIntersection = (x: to, y: rightIntercept!)
+		self.leftIntersection = (x: from, y: leftIntercept!)
+		self.leftLimit = leftLimit!
+		
+	}
 	
 }
 
