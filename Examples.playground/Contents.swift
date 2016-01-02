@@ -1,3 +1,0 @@
-//: IntuitiveMath: Examples
-
-import Cocoa
