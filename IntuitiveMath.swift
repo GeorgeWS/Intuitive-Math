@@ -114,21 +114,22 @@ struct IntuitiveCurve {
 		/// The limit of the right asymptote (as x → ∞)
 		case RightLimit(Double)
 		/// The y value of the intersection between the curve and a horizontal
-		/// line located `percentInset` percent down from the top (right if
-		/// increasing, left if decreasing) limit.
-		case TopIntercept(Double)
+		/// line located `percentInset` percent in (down if increasing, up if
+		/// decreasing) from the right limit.
+		case RightIntercept(Double)
 		/// The y value of the intersection between the curve and a horizontal
-		/// line located `percentInset` percent up from the bottom (left if
-		/// increasing, right if decreasing) limit.
-		case BottomIntercept(Double)
+		/// line located `percentInset` percent in (up if increasing, down if
+		/// decreasing) from the left limit.
+		case LeftIntercept(Double)
 		/// The limit of the left asymptote (as x → -∞)
 		case LeftLimit(Double)
 	}
 	
 	let rightLimit: Double
+	let rightIntersection: (x: Double, y: Double)
+	let leftIntersection: (x: Double, y: Double)
 	let leftLimit: Double
-	let topIntercection: (x: Double, y: Double)
-	let bottomIntersection: (x: Double, y: Double)
+	
 	let percentInset: Double
 	
 	// The base function used to make the curve. Might want to allow base
@@ -147,9 +148,9 @@ struct IntuitiveCurve {
 func ==(lhs: IntuitiveCurve.YHandle, rhs: IntuitiveCurve.YHandle) -> Bool {
 	switch (lhs, rhs) {
 	case (.RightLimit, .RightLimit): return true
+	case (.RightIntercept, .RightIntercept): return true
+	case (.LeftIntercept, .LeftIntercept): return true
 	case (.LeftLimit, .LeftLimit): return true
-	case (.TopIntercept, .TopIntercept): return true
-	case (.BottomIntercept, .BottomIntercept): return true
 	default: return false
 	}
 }
