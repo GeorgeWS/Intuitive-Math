@@ -42,7 +42,7 @@ func transform(f: (Double -> Double), a: Double = 1, b: Double = 1, h: Double = 
 ///	- parameter percentage: The percentage specifying where in the given range
 ///		the desired value is located.
 ///
-func numberScaledByPercentage(percentage: Double, from: Double, to: Double) -> Double {
+func scale(from from: Double, to: Double, by percentage: Double) -> Double {
 	return from + percentage * (to - from)
 }
 
@@ -168,23 +168,23 @@ struct IntuitiveCurve {
 		// Derive remaining two vertical parameters from supplied y-handles:
 		switch (leftLimit, leftIntercept, rightIntercept, rightLimit) {
 		case (let leftLimit?, _, _, let rightLimit?):
-			leftIntercept = numberScaledByPercentage(percentInset, from: leftLimit, to: rightLimit)
-			rightIntercept = numberScaledByPercentage(1 - percentInset, from: leftLimit, to: rightLimit)
+			leftIntercept = scale(from: leftLimit, to: rightLimit, by: percentInset)
+			rightIntercept = scale(from: leftLimit, to: rightLimit, by: 1 - percentInset)
 		case (let leftLimit?, _, let rightIntercept?, _):
-			rightLimit = numberScaledByPercentage(1 / (1 - percentInset), from: leftLimit, to: rightIntercept)
-			leftIntercept = numberScaledByPercentage(percentInset, from: leftLimit, to: rightLimit!)
+			rightLimit = scale(from: leftLimit, to: rightIntercept, by: 1 / (1 - percentInset))
+			leftIntercept = scale(from: leftLimit, to: rightLimit!, by: percentInset)
 		case (let leftLimit?, let leftIntercept?, _, _):
-			rightLimit = numberScaledByPercentage(1 / percentInset, from: leftLimit, to: leftIntercept)
-			rightIntercept = numberScaledByPercentage(1 - percentInset, from: leftLimit, to: rightLimit!)
+			rightLimit = scale(from: leftLimit, to: leftIntercept, by: 1 / percentInset)
+			rightIntercept = scale(from: leftLimit, to: rightLimit!, by: 1 - percentInset)
 		case (_, let leftIntercept?, _, let rightLimit?):
-			leftLimit = numberScaledByPercentage(1 / (1 - percentInset), from: rightLimit, to: leftIntercept)
-			rightIntercept = numberScaledByPercentage(1 - percentInset, from: leftLimit!, to: rightLimit)
+			leftLimit = scale(from: rightLimit, to: leftIntercept, by: 1 / (1 - percentInset))
+			rightIntercept = scale(from: leftLimit!, to: rightLimit, by: 1 - percentInset)
 		case (_, let leftIntercept?, let rightIntercept?, _):
-			rightLimit = numberScaledByPercentage((1 - percentInset) / (1 - 2 * percentInset), from: leftIntercept, to: rightIntercept)
-			leftLimit = numberScaledByPercentage(1 / (1 - percentInset), from: rightLimit!, to: leftIntercept)
+			rightLimit = scale(from: leftIntercept, to: rightIntercept, by: (1 - percentInset) / (1 - 2 * percentInset))
+			leftLimit = scale(from: rightLimit!, to: leftIntercept, by: 1 / (1 - percentInset))
 		case (_, _, let rightIntercept?, let rightLimit?):
-			leftLimit = numberScaledByPercentage(1 / percentInset, from: rightLimit, to: rightIntercept)
-			leftIntercept = numberScaledByPercentage(percentInset, from: leftLimit!, to: rightLimit)
+			leftLimit = scale(from: rightLimit, to: rightIntercept, by: 1 / percentInset)
+			leftIntercept = scale(from: leftLimit!, to: rightLimit, by: percentInset)
 		default: break
 		}
 		
