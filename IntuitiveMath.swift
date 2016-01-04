@@ -164,6 +164,7 @@ struct IntuitiveCurve {
 		case .LeftLimit(let a): leftLimit = a
 		}
 		
+		// Derive remaining two vertical parameters from supplied y-handles:
 		switch (leftLimit, leftIntercept, rightIntercept, rightLimit) {
 		case (let leftLimit?, _, _, let rightLimit?):
 			leftIntercept = numberScaledByPercentage(percentInset, from: leftLimit, to: rightLimit)
@@ -191,22 +192,32 @@ struct IntuitiveCurve {
 		self.leftIntersection = (x: from, y: leftIntercept!)
 		self.leftLimit = leftLimit!
 		
-		let leftLimitAsPercentageOfRightLimit = self.leftLimit / self.rightLimit
-		let a = (1 - leftLimitAsPercentageOfRightLimit) / 2
-		let d = 1 - a
-		let xDistanceFromStartToEnd = self.rightIntersection.x - self.leftIntersection.x
-		let endXUnscaledValue = self.inverseBaseFunction((1 / a) * (self.rightIntersection.y / self.rightLimit - d))
-		let startXUnscaledValue = self.inverseBaseFunction((1 / a) * (self.leftIntersection.y / self.rightLimit - d))
-		let differenceBetweenUnscaledXValues = endXUnscaledValue - startXUnscaledValue
-		let b = differenceBetweenUnscaledXValues / xDistanceFromStartToEnd
-		let endXUnshiftedValue = (1 / b) * endXUnscaledValue
-		let startXUnshiftedValue = (1 / b) * startXUnscaledValue
-		let differenceBetweenXValues = endXUnshiftedValue - startXUnshiftedValue
-		let h = differenceBetweenXValues / 2 + self.leftIntersection.x
-		let function = transform(self.baseFunction, a: a, b: b, h: h, d: d)
-		let scaledFunction = transform(function, a: self.rightLimit)
+		// Derive vertical transformation constants (a = scale, d = shift):
+		let a = (self.rightLimit - self.leftLimit) / 2
+		let d = self.rightLimit - a
 		
-		self.apply = scaledFunction
+		// Use inverse function to get x-positions of desired y-intercepts
+		// on curve without horizontal transformations:
+		let unscaledX1 = self.inverseBaseFunction((self.leftIntersection.y - d) / a)
+		let unscaledX2 = self.inverseBaseFunction((self.rightIntersection.y - d) / a)
+		
+		// Derive horizontal scale factor:
+		let unscaledXRange = unscaledX2 - unscaledX1
+		let desiredXRange = self.rightIntersection.x - self.leftIntersection.x
+		let b = unscaledXRange / desiredXRange
+		
+		// Get scaled (but still unshifted) x-positions of desired y-intercepts:
+		let scaledButUnshiftedX1 = unscaledX1 / b
+		let scaledButUnshiftedX2 = unscaledX2 / b
+		
+		// Derive horizontal shift:
+		let scaledXRange = scaledButUnshiftedX2 - scaledButUnshiftedX1
+		let h = scaledXRange / 2 + self.leftIntersection.x
+		
+		// Construct desired function (and its inverse) with derived parameters:
+		let function = transform(self.baseFunction, a: a, b: b, h: h, d: d)
+		
+		self.apply = function
 		
 	}
 	
