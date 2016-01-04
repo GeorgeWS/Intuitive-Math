@@ -140,6 +140,7 @@ struct IntuitiveCurve {
 	let inverseBaseFunction: Double -> Double = atanh
 	
 	let apply: Double -> Double
+	let applyInverse: Double -> Double
 	
 	init(from: Double, to: Double, withYHandles yHandles: (YHandle, YHandle) = (.LeftLimit(0), .RightLimit(1)), insetByPercent percentInset: Double = 0.01) {
 		
@@ -216,8 +217,10 @@ struct IntuitiveCurve {
 		
 		// Construct desired function (and its inverse) with derived parameters:
 		let function = transform(self.baseFunction, a: a, b: b, h: h, d: d)
+		let inverseFunction = transform(self.inverseBaseFunction, a: 1 / b, b: 1 / a, h: d, d: h)
 		
 		self.apply = function
+		self.applyInverse = inverseFunction
 		
 	}
 	
