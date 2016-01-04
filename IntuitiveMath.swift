@@ -139,23 +139,7 @@ struct IntuitiveCurve {
 	let baseFunction: Double -> Double = tanh
 	let inverseBaseFunction: Double -> Double = atanh
 	
-	lazy var apply: Double -> Double = {
-		let leftLimitAsPercentageOfRightLimit = self.leftLimit / self.rightLimit
-		let a = (1 - leftLimitAsPercentageOfRightLimit) / 2
-		let d = 1 - a
-		let xDistanceFromStartToEnd = self.rightIntersection.x - self.leftIntersection.x
-		let endXUnscaledValue = self.inverseBaseFunction((1 / a) * (self.rightIntersection.y / self.rightLimit - d))
-		let startXUnscaledValue = self.inverseBaseFunction((1 / a) * (self.leftIntersection.y / self.rightLimit - d))
-		let differenceBetweenUnscaledXValues = endXUnscaledValue - startXUnscaledValue
-		let b = differenceBetweenUnscaledXValues / xDistanceFromStartToEnd
-		let endXUnshiftedValue = (1 / b) * endXUnscaledValue
-		let startXUnshiftedValue = (1 / b) * startXUnscaledValue
-		let differenceBetweenXValues = endXUnshiftedValue - startXUnshiftedValue
-		let h = differenceBetweenXValues / 2 + self.leftIntersection.x
-		let function = transform(self.baseFunction, a: a, b: b, h: h, d: d)
-		let scaledFunction = transform(function, a: self.rightLimit)
-		return scaledFunction
-	}()
+	let apply: Double -> Double
 	
 	init(from: Double, to: Double, withYHandles yHandles: (YHandle, YHandle) = (.LeftLimit(0), .RightLimit(1)), insetByPercent percentInset: Double = 0.01) {
 		
@@ -206,6 +190,23 @@ struct IntuitiveCurve {
 		self.rightIntersection = (x: to, y: rightIntercept!)
 		self.leftIntersection = (x: from, y: leftIntercept!)
 		self.leftLimit = leftLimit!
+		
+		let leftLimitAsPercentageOfRightLimit = self.leftLimit / self.rightLimit
+		let a = (1 - leftLimitAsPercentageOfRightLimit) / 2
+		let d = 1 - a
+		let xDistanceFromStartToEnd = self.rightIntersection.x - self.leftIntersection.x
+		let endXUnscaledValue = self.inverseBaseFunction((1 / a) * (self.rightIntersection.y / self.rightLimit - d))
+		let startXUnscaledValue = self.inverseBaseFunction((1 / a) * (self.leftIntersection.y / self.rightLimit - d))
+		let differenceBetweenUnscaledXValues = endXUnscaledValue - startXUnscaledValue
+		let b = differenceBetweenUnscaledXValues / xDistanceFromStartToEnd
+		let endXUnshiftedValue = (1 / b) * endXUnscaledValue
+		let startXUnshiftedValue = (1 / b) * startXUnscaledValue
+		let differenceBetweenXValues = endXUnshiftedValue - startXUnshiftedValue
+		let h = differenceBetweenXValues / 2 + self.leftIntersection.x
+		let function = transform(self.baseFunction, a: a, b: b, h: h, d: d)
+		let scaledFunction = transform(function, a: self.rightLimit)
+		
+		self.apply = scaledFunction
 		
 	}
 	
